@@ -14,12 +14,13 @@ This is the driving business problem for the current phase of work — every req
 
 ## Current focus: Requirements & Product Backlog
 
-Work right now is concentrated in **`docs/01-requirements/`**. `02-design/`, `03-testing/`, and `04-retrospectives/` are downstream stages — do not get ahead of the requirements phase by filling those in yet.
+Work right now is concentrated in **`docs/01-requirements/`**. `02-design/`, `03-testing/`, and `04-retrospectives/` are downstream stages — do not get ahead of the requirements phase by filling those in yet, with one explicit exception: `02-design/01-prototypes/user-journey-self-order.md` (see `feature-list.md` and the second automation pipeline below) — it's generated alongside the feature list to keep requirement traceability visible early. Don't otherwise add content to `02-design/`.
 
 - **`01-spec/`** — feature requirements and user stories written against โจทย์ 1 above (e.g. "ในฐานะลูกค้า ฉันต้องการสแกน QR ที่โต๊ะเพื่อดูเมนูและสั่งอาหาร"), plus explicit in-scope/out-of-scope boundaries for this phase. File naming convention: `{YYYYMMDD}-{2-digit running no}-{english-kebab-case-topic}.md`, running number resets per day.
 - **`02-plan/`** — how spec items are phased/sequenced (roadmap, milestones).
 - **`03-task/`** — granular task breakdown for an in-progress spec item (to-do list, assignee, status), used once an item moves from "backlog" to "being worked on."
 - **`backlog.md`** (at the `01-requirements/` root, not a numbered subfolder) — the **Product Backlog**: a single prioritized table listing every spec doc, its priority, and its status. This is the canonical backlog artifact. When asked to write or update the Product Backlog, update this file, not `03-task/`.
+- **`feature-list.md`** (at the `01-requirements/` root) — a **MoSCoW-prioritized feature list** derived from `backlog.md` + `01-spec/`: one row per feature (a single spec doc can split into several features), each with a summary table entry plus a detailed section carrying the MoSCoW rating and the reasoning behind it. Kept in sync by the automation pipeline below — don't hand-edit MoSCoW ratings without also reconciling the source spec/backlog reasoning.
 
 Every new spec or backlog entry should be traceable back to the โจทย์ above; if a proposed item doesn't serve "ลูกค้าสั่ง Order ได้เองจากที่โต๊ะ", flag it rather than assuming it belongs in this phase.
 
@@ -31,6 +32,16 @@ Turning a raw requirement into documentation is handled by a skill + subagent pa
 - **Subagent** [`requirement-writer`](.claude/agents/requirement-writer.md) — invoked by the skill only after clarification is done. Never asks the user anything; writes the spec doc under `01-spec/` (or amends an existing one), updates `backlog.md`, and appends a summary to `05-log/{YYYYMMDD}-log.md`.
 
 Prefer invoking the `requirement-to-backlog` skill over manually drafting spec docs, so the backlog and log stay in sync automatically.
+
+### Automation: backlog → feature list + user journey pipeline
+
+A second skill + subagent pair keeps the feature list and user journey in sync with the backlog, rather than drafting them ad hoc:
+
+- **Skill** [`backlog-to-feature-journey`](.claude/skills/backlog-to-feature-journey/SKILL.md) — the interactive front door. Audits `backlog.md`/`01-spec/` for drift (new specs missing from the feature list, features whose source spec was archived, journey steps that no longer match a spec), and asks clarifying questions via `AskUserQuestion` (same **at least 3 concrete options** rule as above) only when something is genuinely ambiguous — otherwise it proceeds with a documented default.
+- **Subagent** [`feature-list-writer`](.claude/agents/feature-list-writer.md) — writes/updates `01-requirements/feature-list.md`. Never asks the user anything.
+- **Subagent** [`user-journey-writer`](.claude/agents/user-journey-writer.md) — writes/updates `02-design/01-prototypes/user-journey-self-order.md` as a Mermaid `flowchart TD` with a step-by-step explanation mapped back to requirement docs. Never asks the user anything. **Hard rule: must never draw a "call staff to take the order" step** in any journey — self-order exists specifically to replace that, per โจทย์ 1.
+
+The two subagents run in parallel and only write their own artifact file; the skill itself writes the `05-log/{YYYYMMDD}-log.md` entry afterward (avoids both subagents racing to edit the same log file). Prefer invoking `backlog-to-feature-journey` over manually editing `feature-list.md` or the user-journey doc.
 
 ## Structure and workflow
 
@@ -48,7 +59,7 @@ All content lives under `docs/`, organized as a pipeline that mirrors the projec
 ```
 
 - **`01-requirements/`** — source of truth for what the system must do: specs (`01-spec`), roadmap/phasing (`02-plan`), task breakdowns (`03-task`), and the master `backlog.md`.
-- **`02-design/`** — UI/UX prototypes (`01-prototypes`) and technical design: architecture, DB schema, API contracts (`02-technical`). This is the blueprint developers reference once code is written.
+- **`02-design/`** — UI/UX prototypes (`01-prototypes`) and technical design: architecture, DB schema, API contracts (`02-technical`). This is the blueprint developers reference once code is written. Currently the only populated file here is `01-prototypes/user-journey-self-order.md` (see the automation pipeline above) — everything else in `02-design/` is still just skeleton `index.md` files pending the design phase.
 - **`03-testing/`** — test plans/cases derived from design (`01-test-plan`) and actual pass/fail results and bugs (`02-test-result`).
 - **`04-retrospectives/`** — lessons learned per phase/sprint, informed by test results and the log.
 - **`05-log/`** — chronological changelog and decision log, one file per day (`{YYYYMMDD}-log.md`); the evidentiary record other sections cite.
