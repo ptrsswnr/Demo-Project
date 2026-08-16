@@ -14,7 +14,7 @@ This is the driving business problem for the current phase of work — every req
 
 ## Current focus: Requirements & Product Backlog
 
-Work right now is concentrated in **`docs/01-requirements/`**. `02-design/`, `03-testing/`, and `04-retrospectives/` are downstream stages — do not get ahead of the requirements phase by filling those in yet, with one explicit exception: `02-design/01-prototypes/user-journey-self-order.md` (see `feature-list.md` and the second automation pipeline below) — it's generated alongside the feature list to keep requirement traceability visible early. Don't otherwise add content to `02-design/`.
+Work right now is concentrated in **`docs/01-requirements/`**. `03-testing/` and `04-retrospectives/` are downstream stages and still just skeleton `index.md` files. `02-design/` is further along: `02-design/01-prototypes/user-journey-self-order.md` (see `feature-list.md` and the second automation pipeline below) is generated alongside the feature list to keep requirement traceability visible early, and `02-design/02-technical/design-system.md` holds the product's design system (Brand Identity & CI, Design Tokens, UI Components & Patterns, UX Guidelines).
 
 - **`01-spec/`** — feature requirements and user stories written against โจทย์ 1 above (e.g. "ในฐานะลูกค้า ฉันต้องการสแกน QR ที่โต๊ะเพื่อดูเมนูและสั่งอาหาร"), plus explicit in-scope/out-of-scope boundaries for this phase. File naming convention: `{YYYYMMDD}-{2-digit running no}-{english-kebab-case-topic}.md`, running number resets per day.
 - **`02-plan/`** — how spec items are phased/sequenced (roadmap, milestones).
@@ -59,7 +59,7 @@ All content lives under `docs/`, organized as a pipeline that mirrors the projec
 ```
 
 - **`01-requirements/`** — source of truth for what the system must do: specs (`01-spec`), roadmap/phasing (`02-plan`), task breakdowns (`03-task`), and the master `backlog.md`.
-- **`02-design/`** — UI/UX prototypes (`01-prototypes`) and technical design: architecture, DB schema, API contracts (`02-technical`). This is the blueprint developers reference once code is written. Currently the only populated file here is `01-prototypes/user-journey-self-order.md` (see the automation pipeline above) — everything else in `02-design/` is still just skeleton `index.md` files pending the design phase.
+- **`02-design/`** — UI/UX prototypes (`01-prototypes`) and technical design: architecture, DB schema, API contracts, design system (`02-technical`). This is the blueprint developers reference once code is written. Populated so far: `01-prototypes/user-journey-self-order.md` (see the automation pipeline above) and `02-technical/design-system.md` (Brand Identity & CI, Design Tokens, UI Components & Patterns, UX Guidelines) — architecture, DB schema, and API contracts are still pending.
 - **`03-testing/`** — test plans/cases derived from design (`01-test-plan`) and actual pass/fail results and bugs (`02-test-result`).
 - **`04-retrospectives/`** — lessons learned per phase/sprint, informed by test results and the log.
 - **`05-log/`** — chronological changelog and decision log, one file per day (`{YYYYMMDD}-log.md`); the evidentiary record other sections cite.
